@@ -94,7 +94,7 @@ void show_transaction_history(int cust_id)
         if (temp_trans.user_id == cust_id)
         {
             //char buffer[512];
-            printf("user id: %d  %s  %s %d", temp_trans.user_id, temp_trans.transaction, temp_trans.date_time, temp_trans.current_balance);
+            printf("| user id:|%d|  status:|%s|  date: |%s| current Balance: |%d| |\n", temp_trans.user_id, temp_trans.transaction, temp_trans.date_time, temp_trans.current_balance);
             // send(client_socket,buffer,strlen(buffer),0);
         }
     }

@@ -142,6 +142,7 @@ bool handle_customer(int client_socket)
 				case 6:
 					// char *db = "customer";
 					// edit_credentials_customer(userid_buffer);
+					edit_credentials_customer(client_socket,userid_buffer);
 					break;
 				case 7:
 					char feedback[1024];
@@ -165,11 +166,12 @@ bool handle_customer(int client_socket)
 					break;
 				case 10:
 					// exit: it will terminate client server connection.
-					send(client_socket, "Exiting..", strlen("Exiting.."), 0);
+					send(client_socket, "Exiting..\n", strlen("Exiting..\n"), 0);
 					close(client_socket);
 					exit(0);
+					break;
 				default:
-					send(client_socket, "Invalid response", strlen("Invalid response"), 0);
+					//send(client_socket, "Invalid response\n", strlen("Invalid response\n"), 0);
 					break;
 				}
 				if (menu_options_recv == 9)
@@ -182,10 +184,10 @@ bool handle_customer(int client_socket)
 		else
 		{
 			// authentication failed.
-			send(client_socket, "Username or Password is invalid", strlen("Username or Password is invalid"), 0);
+			send(client_socket, "Username or Password is invalid customer 186", strlen("Username or Password is invalid customer 186"), 0);
 			return false;
 			// close(client_socket);
 		}
 	}
-	return true;
+	//return true;
 }

@@ -17,10 +17,10 @@ void assign_loan(int client_socket)
 {
     //this fucntion will be used by manager to assign loan to some employee.
     int employee_id;
-    char emp_id_buff[1024];
+    // char emp_id_buff[1024];
     //send(client_socket,"Enter employee id to whom you want to assign loan application: ",strlen("Enter employee id to whom you want to assign loan appplication: "),0);
-    int rec_emp = recv(client_socket,&emp_id_buff,sizeof(emp_id_buff),0);
-    employee_id = atoi(emp_id_buff);
+    int rec_emp = recv(client_socket,&employee_id,sizeof(employee_id),0);
+    // employee_id = atoi(emp_id_buff);
     if(rec_emp <= 0)
     {
         perror("recv error");
@@ -29,9 +29,9 @@ void assign_loan(int client_socket)
     }
     //send(client_socket,"Enter customer id whose loan you want to assign: ",strlen("Enter customer id whose loan you want to assign: "),0);
     int cust_id;
-    char cust_id_buff[1024];
-    int rec_cust = recv(client_socket,&cust_id_buff,sizeof(cust_id_buff),0);
-    cust_id = atoi(cust_id_buff);
+    // char cust_id_buff[1024];
+    int rec_cust = recv(client_socket,&cust_id,sizeof(cust_id),0);
+    // cust_id = atoi(cust_id_buff);
     if(rec_cust <= 0)
     {    
         perror("recv error");
@@ -87,7 +87,7 @@ void assign_loan(int client_socket)
                 return;
             }
             char msg[256];
-            sprintf(msg,"loan application of customer_id %d ,assigned to emp_id: %d",cust_id,employee_id);
+            sprintf(msg,"loan application of customer_id %d ,assigned to emp_id: %d\n",cust_id,employee_id);
             send(client_socket,msg,strlen(msg),0);
             close(fd_loan);
             return;
@@ -120,6 +120,7 @@ void approve_loan(int client_socket,int employee_id,int customer_id)
     struct customer temp_cust;
     struct loan temp_loan;
     struct flock lkl;
+    int flag1=0,flag2=0;
     //update in customer db.
     while(read(fd_cust,&temp_cust,sizeof(struct customer)) > 0)
     {
@@ -137,35 +138,35 @@ void approve_loan(int client_socket,int employee_id,int customer_id)
                     return;
                 }
             temp_cust.loan_approved = true;
-            char msg[256];
-            sprintf(msg,"loan of cutomer_id: %d,loan amount: %d approved by emp_id: %d",customer_id,temp_cust.loan_amount,employee_id);
-            send(client_socket,msg,strlen(msg),0);
+            if(lseek(fd_cust,-sizeof(struct customer),SEEK_CUR) == -1)
+            {
+                perror("lseek error");
+                close(fd_cust);
+                close(fd_loan);
+                return;
+            }
+            if((write(fd_cust,&temp_cust,sizeof(struct customer))) <= 0)
+            {
+                perror("write error");
+                close(fd_cust);
+                close(fd_loan);
+                return;
+            }
+            lkl.l_type = F_UNLCK;
+            if(fcntl(fd_cust,F_SETLK,&lkl) == -1)
+            {
+                perror("fcntl error");
+                close(fd_cust);
+                close(fd_loan);
+                return;
+            }
+            flag1=1;
             break;
+
         }
     }
     //before unlocking write to customer db.
-    if(lseek(fd_cust,-sizeof(struct customer),SEEK_CUR) == -1)
-    {
-        perror("lseek error");
-        close(fd_cust);
-        close(fd_loan);
-        return;
-    }
-    if((write(fd_cust,&temp_cust,sizeof(struct customer))) <= 0)
-    {
-        perror("write error");
-        close(fd_cust);
-        close(fd_loan);
-        return;
-    }
-    lkl.l_type = F_UNLCK;
-    if(fcntl(fd_cust,F_SETLK,&lkl) == -1)
-    {
-        perror("fcntl error");
-        close(fd_cust);
-        close(fd_loan);
-        return;
-    }
+    
     //update in loan db.
     //match both emp_id and customer_id in loan db.
     while(read(fd_loan,&temp_loan,sizeof(struct loan)) > 0)
@@ -188,11 +189,22 @@ void approve_loan(int client_socket,int employee_id,int customer_id)
                 close(fd_loan);
                 return;
             }
-            return;
+            flag2=1;
+            break;
         }
     }
-
-
+    if(flag1==1 && flag2==1)
+    {
+        char msg[256];
+        sprintf(msg,"loan of cutomer_id: %d,loan amount: %d approved by emp_id: %d",customer_id,temp_cust.loan_amount,employee_id);
+        send(client_socket,msg,strlen(msg),0);
+    }
+    else
+    {
+        //char msg2[256];
+        //sprintf(msg2,"loan of cutomer_id: %d,loan amount: %d approved by emp_id: %d",customer_id,temp_cust.loan_amount,employee_id);
+        send(client_socket,"Could not approve loan",strlen("Could not approve loan"),0);
+    }
     close(fd_cust);
     close(fd_loan);
     //close(client_socket);

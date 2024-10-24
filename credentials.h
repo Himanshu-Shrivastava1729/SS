@@ -131,12 +131,20 @@ void password_hash_to_hex(const unsigned char *hashed_pswd, char *hex_pswd)
 // 	send(client_socket,"user credentials addded successfully",strlen("user credentials addded successfully"),0);
 // 	//close(client_socket);
 // }
-void edit_credentials_customer(int user_id)
+void edit_credentials_customer(int client_socket,int user_id)
 {
 	// this fucntion will work only for customer.
 	// find username and pswd in the customer_db.txt file and then update only password.
 	struct customer temp;
 	int fd = open("customer_db.txt", O_RDWR);
+	char temp_pswd[128];
+	int rec_client = recv(client_socket,temp_pswd, sizeof(temp_pswd), 0);
+	temp_pswd[rec_client] = '\0';
+	if (rec_client == -1)
+	{
+		perror("recv error");
+		return;
+	}
 	while (read(fd, &temp, sizeof(temp)) > 0)
 	{
 		if (temp.customer_id == user_id)
@@ -154,15 +162,14 @@ void edit_credentials_customer(int user_id)
 				// close(client_socket);
 				return;
 			}
-			if (lseek(fd, -sizeof(temp), SEEK_CUR) == -1)
-			{
-				perror("lseek error");
-				close(fd);
-				return;
-			}
+			// if (lseek(fd, -sizeof(temp), SEEK_CUR) == -1)
+			// {
+			// 	perror("lseek error");
+			// 	close(fd);
+			// 	return;
+			// }
 			unsigned char hashed_pswd[SHA256_DIGEST_LENGTH];
 			char hex_pswd[65];
-			char temp_pswd[128];
 			// send(client_socket, "Enter new password:", strlen("Enter new password:"), 0);
 			// int rec_client = recv(client_socket, temp_pswd, sizeof(temp_pswd), 0);
 			// temp_pswd[rec_client] = '\0';
@@ -171,8 +178,8 @@ void edit_credentials_customer(int user_id)
 			//  	perror("recv error");
 			//  	return;
 			//  }
-			printf("Enter new password:\n");
-			scanf("%s", temp_pswd);
+			// printf("Enter new password:\n");
+			// scanf("%s", temp_pswd);
 			trim_trailing_spaces(temp_pswd);
 			trim_leading_spaces(temp_pswd);
 			hash_password(temp_pswd, hashed_pswd);
@@ -197,14 +204,14 @@ void edit_credentials_customer(int user_id)
 				// close(client_socket);
 				return;
 			}
-			// send(client_socket, "Password updated successfully", strlen("Password updated successfully"), 0);
-			printf("Password updated successfully\n");
+			 send(client_socket, "Password updated successfully", strlen("Password updated successfully"), 0);
+			//printf("Password updated successfully\n");
 			close(fd);
 			return;
 		}
 	}
-	// send(client_socket, "User credentials not present in db.", strlen("User credentials not present in db."), 0);
-	printf("User credentials not present in db.\n");
+	 send(client_socket, "User credentials not present in db.", strlen("User credentials not present in db."), 0);
+	//printf("User credentials not present in db.\n");
 	close(fd);
 	return;
 }
@@ -213,6 +220,16 @@ void edit_credentials_employee(int client_socket, int user_id)
 	// this fucntion will work for all except for customer bcz in struct  customer we've customer_id while in other struct we've emp_id.
 	struct employee temp;
 	int fd = open("employee_db.txt", O_RDWR);
+	char temp_pswd[128];
+	// send(client_socket, "Enter new password:", strlen("Enter new password:"), 0);
+
+	int rec_client = recv(client_socket, temp_pswd, sizeof(temp_pswd), 0);
+	temp_pswd[rec_client] = '\0';
+	if (rec_client == -1)
+	{
+		perror("recv error");
+		return;
+	}
 	while (read(fd, &temp, sizeof(temp)) > 0)
 	{
 		if (temp.emp_id == user_id)
@@ -230,24 +247,14 @@ void edit_credentials_employee(int client_socket, int user_id)
 				// close(client_socket);
 				return;
 			}
-			if (lseek(fd, -sizeof(temp), SEEK_CUR) == -1)
-			{
-				perror("lseek error");
-				close(fd);
-				return;
-			}
+			// if (lseek(fd, -sizeof(temp), SEEK_CUR) == -1)
+			// {
+			// 	perror("lseek error");
+			// 	close(fd);
+			// 	return;
+			// }
 			unsigned char hashed_pswd[SHA256_DIGEST_LENGTH];
 			char hex_pswd[65];
-			char temp_pswd[128];
-			// send(client_socket, "Enter new password:", strlen("Enter new password:"), 0);
-
-			int rec_client = recv(client_socket, &temp_pswd, sizeof(temp_pswd), 0);
-			temp_pswd[rec_client] = '\0';
-			if (rec_client == -1)
-			{
-				perror("recv error");
-				return;
-			}
 			trim_trailing_spaces(temp_pswd);
 			trim_leading_spaces(temp_pswd);
 			hash_password(temp_pswd, hashed_pswd);
@@ -286,6 +293,15 @@ void edit_credentials_manager(int client_socket, int user_id)
 {
 	struct manager temp;
 	int fd = open("manager_db.txt", O_RDWR);
+	char temp_pswd[128];
+	// send(client_socket, "Enter new password:", strlen("Enter new password:"), 0);
+	int rec_client = recv(client_socket, temp_pswd, sizeof(temp_pswd), 0);
+	temp_pswd[rec_client] = '\0';
+	if (rec_client == -1)
+	{
+		perror("recv error");
+		return;
+	}
 	while (read(fd, &temp, sizeof(temp)) > 0)
 	{
 		if (temp.emp_id == user_id)
@@ -303,23 +319,14 @@ void edit_credentials_manager(int client_socket, int user_id)
 				// close(client_socket);
 				return;
 			}
-			if (lseek(fd, -sizeof(temp), SEEK_CUR) == -1)
-			{
-				perror("lseek error");
-				close(fd);
-				return;
-			}
+			// if (lseek(fd, -sizeof(temp), SEEK_CUR) == -1)
+			// {
+			// 	perror("lseek error");
+			// 	close(fd);
+			// 	return;
+			// }
 			unsigned char hashed_pswd[SHA256_DIGEST_LENGTH];
 			char hex_pswd[65];
-			char temp_pswd[128];
-			// send(client_socket, "Enter new password:", strlen("Enter new password:"), 0);
-			int rec_client = recv(client_socket, &temp_pswd, sizeof(temp_pswd), 0);
-			temp_pswd[rec_client] = '\0';
-			if (rec_client == -1)
-			{
-				perror("recv error");
-				return;
-			}
 			trim_trailing_spaces(temp_pswd);
 			trim_leading_spaces(temp_pswd);
 			hash_password(temp_pswd, hashed_pswd);
@@ -356,9 +363,23 @@ void edit_credentials_manager(int client_socket, int user_id)
 
 void edit_credentials_admin(int client_socket, int user_id)
 {
-	// this fucntion will work for all except for customer bcz in struct  customer we've customer_id while in other struct we've emp_id.
+	
 	struct admin temp;
 	int fd = open("admin_db.txt", O_RDWR);
+	if(fd<0)
+	{
+		perror("error while opening admin_db crentials 371\n");
+		return ;
+	}
+	char temp_pswd[128];
+	//send(client_socket, "Enter new password:", strlen("Enter new password:"), 0);
+	int rec_client = recv(client_socket, temp_pswd, sizeof(temp_pswd), 0);
+	temp_pswd[rec_client] = '\0';
+	if (rec_client == -1)
+	{
+		perror("recv error");
+		return;
+	}
 	while (read(fd, &temp, sizeof(temp)) > 0)
 	{
 		if (temp.emp_id == user_id)
@@ -376,23 +397,23 @@ void edit_credentials_admin(int client_socket, int user_id)
 				// close(client_socket);
 				return;
 			}
-			if (lseek(fd, -sizeof(temp), SEEK_CUR) == -1)
-			{
-				perror("lseek error");
-				close(fd);
-				return;
-			}
+			// if (lseek(fd, -sizeof(temp), SEEK_CUR) == -1)
+			// {
+			// 	perror("cerdentials 388 lseek error");
+			// 	close(fd);
+			// 	return;
+			// }
 			unsigned char hashed_pswd[SHA256_DIGEST_LENGTH];
 			char hex_pswd[65];
-			char temp_pswd[128];
-			send(client_socket, "Enter new password:", strlen("Enter new password:"), 0);
-			int rec_client = recv(client_socket, &temp_pswd, sizeof(temp_pswd), 0);
-			temp_pswd[rec_client] = '\0';
-			if (rec_client == -1)
-			{
-				perror("recv error");
-				return;
-			}
+			// char temp_pswd[128];
+			// //send(client_socket, "Enter new password:", strlen("Enter new password:"), 0);
+			// int rec_client = recv(client_socket, temp_pswd, sizeof(temp_pswd), 0);
+			// temp_pswd[rec_client] = '\0';
+			// if (rec_client == -1)
+			// {
+			// 	perror("recv error");
+			// 	return;
+			// }
 			trim_trailing_spaces(temp_pswd);
 			trim_leading_spaces(temp_pswd);
 			hash_password(temp_pswd, hashed_pswd);
@@ -401,7 +422,7 @@ void edit_credentials_admin(int client_socket, int user_id)
 			// write this updated value in db file.
 			if (lseek(fd, -sizeof(struct admin), SEEK_CUR) == -1)
 			{
-				perror("lseek error");
+				perror(" credential 411 lseek error");
 				return;
 			}
 			if ((write(fd, &temp, sizeof(struct admin))) <= 0)

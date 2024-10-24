@@ -81,10 +81,10 @@ bool handle_employee(int client_socket)
                     break;
                 case 3:
                     // send(client_socket, "Enter customer id whose loan you want to approve", strlen("Enter customer id whose loan you want to approve"), 0);
-                    // int customer_id;
-                    char rx_cust[1024];
-                    rec_cust_id = recv(client_socket, rx_cust, sizeof(rx_cust), 0);
-                    customer_id = atoi(rx_cust);
+                    int customer_id;
+                    //char rx_cust[1024];
+                    rec_cust_id = recv(client_socket, &customer_id, sizeof(customer_id), 0);
+                    //customer_id = atoi(rx_cust);
                     if (rec_cust_id == -1)
                     {
                         perror("recv error");
@@ -134,5 +134,5 @@ bool handle_employee(int client_socket)
             return false;
         }
     }
-    return true;
+    //return true;
 }

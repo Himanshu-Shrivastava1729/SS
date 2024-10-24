@@ -142,7 +142,14 @@ int main()
                         printf("%s", loan_buff);
                         break;
                     case 6:
-                        edit_credentials_customer(userid);
+                        printf("Enter new password\n");
+                        char new_pswd1[1024];
+                        scanf("%s",new_pswd1);
+                        char rec_pswd_buff[1024];
+                        send(clientSocket,new_pswd1,strlen(new_pswd1),0);
+                        int rec_new_pswd1 = recv(clientSocket,rec_pswd_buff,sizeof(rec_pswd_buff),0);
+                        rec_pswd_buff[rec_new_pswd1] = '\0';
+                        printf("%s\n",rec_pswd_buff);
                         break;
                     case 7:
                         printf("Enter feedback: \n");
@@ -223,7 +230,7 @@ int main()
                         printf("enter user name: \n");
                         char user_name[100];
                         scanf("%s", user_name);
-                        send(clientSocket, user_name, strlen(user_name), 0);
+                        send(clientSocket, &user_name, strlen(user_name), 0);
 
                         printf("enter customerID: \n");
                         int id;
@@ -321,7 +328,7 @@ int main()
                         int user;
                         scanf("%d", &user);
                         send(clientSocket, &user, sizeof(user), 0);
-                        // char buffer[1024];
+                         char buffer[1024];
                         int rec = recv(clientSocket, buffer, sizeof(buffer), 0);
                         buffer[rec] = '\0';
                         printf("%s", buffer);
@@ -407,63 +414,76 @@ int main()
             auth_buffer_[auth_rcv_] = '\0';
             if (strcmp(auth_buffer_,"Authentication Successful")==0)
             {
-                printf("Select action to perform(Select number corresponding to desired action):\n1)Deactivate account\n2)Show all applied loan applications\n3)Assign loan application to employee\n4)Review Feedback\n5)Change password\n6)logout\n7)exit\n");
-                int choice;
-                scanf("%d", &choice);
-                send(clientSocket, &choice, sizeof(choice), 0);
-                switch (choice)
+                while(1)
                 {
-                case 1:
-                    printf("Enter customer id that you want to deactivate:\n");
-                    int cust_id;
-                    scanf("%d", &cust_id);
-                    send(clientSocket, &cust_id, sizeof(cust_id), 0);
-                    break;
-                case 2:
-                    break;
-                case 3:
-                    printf("Enter employee id to whom you want to assign loan application: \n");
-                    int emp_id_loan;
-                    scanf("%d", &emp_id_loan);
-                    send(clientSocket, &emp_id_loan, sizeof(emp_id_loan), 0);
-                    printf("Enter customer id whose loan you want to assign: \n");
-                    int cust_id_loan;
-                    scanf("%d", &cust_id_loan);
-                    send(clientSocket, &cust_id_loan, sizeof(cust_id_loan), 0);
-                    char loan_buff[256];
-                    int rec_loan = recv(clientSocket, loan_buff, sizeof(loan_buff), 0);
-                    printf("%s", loan_buff);
-                    break;
-                case 4:
-                    printf("Enter customer id whose feedback you want to resolve.\n");
-                    int cust_id_feed;
-                    scanf("%d", &cust_id_feed);
-                    resolve_feedback(cust_id_feed);
-                    break;
-                case 5:
-                    printf("Enter new password:\n");
-                    char new_pass[256];
-                    scanf("%s", new_pass);
-                    send(clientSocket, new_pass, sizeof(new_pass), 0);
-                    char pass_buff[1024];
-                    int rec_new_pass = recv(clientSocket, pass_buff, sizeof(pass_buff), 0);
-                    printf("%s", pass_buff);
-                    break;
-                case 6:
-                    char logout_manager_buff[1024];
-                    int rec_logout_ = recv(clientSocket, logout_manager_buff, sizeof(logout_manager_buff), 0);
-                    printf("%s", logout_manager_buff);
-                    break;
-                case 7:
-                    break;
-                default:
-                    char rec_def_buff[1024];
-                    int rec_def = recv(clientSocket, rec_def_buff, sizeof(rec_def_buff), 0);
-                    printf("%s", rec_def_buff);
-                    break;
+                    printf("Select action to perform(Select number corresponding to desired action):\n1)Deactivate account\n2)Show all applied loan applications\n3)Assign loan application to employee\n4)Review Feedback\n5)Change password\n6)logout\n7)exit\n");
+                    int choice;
+                    scanf("%d", &choice);
+                    send(clientSocket, &choice, sizeof(choice), 0);
+                    switch (choice)
+                    {
+                    case 1:
+                        printf("Enter customer id that you want to deactivate:\n");
+                        int cust_id;
+                        scanf("%d", &cust_id);
+                        send(clientSocket, &cust_id, sizeof(cust_id), 0);
+                        break;
+                    case 2:
+                        view_applied_loan_applications();
+                        break;
+                    case 3:
+                        printf("Enter employee id to whom you want to assign loan application: \n");
+                        int emp_id_loan;
+                        scanf("%d", &emp_id_loan);
+                        send(clientSocket, &emp_id_loan, sizeof(emp_id_loan), 0);
+                        printf("Enter customer id whose loan you want to assign: \n");
+                        int cust_id_loan;
+                        scanf("%d", &cust_id_loan);
+                        send(clientSocket, &cust_id_loan, sizeof(cust_id_loan), 0);
+                        char loan_buff[256];
+                        int rec_loan = recv(clientSocket, loan_buff, sizeof(loan_buff), 0);
+                        loan_buff[rec_loan]='\0';
+                        printf("%s", loan_buff);
+                        break;
+                    case 4:
+                        printf("Enter customer id whose feedback you want to resolve.\n");
+                        int cust_id_feed;
+                        scanf("%d", &cust_id_feed);
+                        resolve_feedback(cust_id_feed);
+                        break;
+                    case 5:
+                        printf("Enter new password:\n");
+                        char new_pass[256];
+                        scanf("%s", new_pass);
+                        send(clientSocket, new_pass, sizeof(new_pass), 0);
+                        char pass_buff[1024];
+                        int rec_new_pass = recv(clientSocket, pass_buff, sizeof(pass_buff), 0);
+                        pass_buff[rec_new_pass] = '\0';
+                        printf("%s", pass_buff);
+                        break;
+                    case 6:
+                        char logout_manager_buff[1024];
+                        int rec_logout_ = recv(clientSocket, logout_manager_buff, sizeof(logout_manager_buff), 0);
+                        logout_manager_buff[rec_logout_]='\0';
+                        printf("%s", logout_manager_buff);
+                        break;
+                    case 7:
+                        char buffer_mng[100];
+                        int rcv_mng=recv(clientSocket,buffer_mng,sizeof(buffer_mng),0);
+                        buffer_mng[rcv_mng]='\0';
+                        printf("%s\n",buffer_mng);
+                        exit(0);
+                        break;
+                    default:
+                        char rec_def_buff[1024];
+                        int rec_def = recv(clientSocket, rec_def_buff, sizeof(rec_def_buff), 0);
+                        rec_def_buff[rec_def]='\0';
+                        printf("%s", rec_def_buff);
+                        break;
+                    }
+                    if (choice == 6)
+                        break;
                 }
-                if (choice == 6)
-                    break;
             }
             else
             {
@@ -607,6 +627,14 @@ int main()
                         char buff2[256];
                         scanf("%s", buff2);
                         send(clientSocket, buff2, strlen(buff2), 0);
+                        char buu_em[200];
+                        int recm=recv(clientSocket,buu_em,sizeof(buu_em),0);
+                        buu_em[recm]='\0';
+                        if(recm<=0)
+                        {
+                            perror("Invalid id");
+                            return 1;
+                        }
                         break;
                     case 4:
                         printf("Enter employee id that you want to make manager.\n");

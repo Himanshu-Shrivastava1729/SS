@@ -84,7 +84,7 @@ bool handle_manager(int client_socket)
                     deactivate_customer(customer_id);
                     break;
                     case 2:
-                    view_applied_loan_applications();
+                    break;
                     break;
                     case 3:
                     assign_loan(client_socket);
@@ -111,11 +111,11 @@ bool handle_manager(int client_socket)
                     break;
                     case 7:
                     //exit: it will terminate client server connection.
-                    send(client_socket,"Exiting..",strlen("Exiting.."),0);
+                    send(client_socket,"Exiting..\n",strlen("Exiting..\n"),0);
                     close(client_socket);
                     exit(0);
                     default:
-                    send(client_socket,"Invalid input",strlen("Invalid input"),0);
+                    //send(client_socket,"Invalid input\n",strlen("Invalid input\n"),0);
                     break;
                 }
                 if(menu_options_recv == 6)

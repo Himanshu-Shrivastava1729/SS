@@ -165,9 +165,9 @@ void edit_customer(int client_socket)
 {
 	int user_id;
 	// send(client_socket, "Enter customer id that you want to modify:", strlen("Enter customer id that you want to modify:"), 0);
-	char emp_buff[1024];
-	int rec_usr_id = recv(client_socket, emp_buff, sizeof(emp_buff), 0);
-	user_id = atoi(emp_buff);
+	// char emp_buff[1024];
+	int rec_usr_id = recv(client_socket, &user_id, sizeof(user_id), 0);
+	// user_id = atoi(emp_buff);
 	if (rec_usr_id == -1)
 	{
 		perror("recv error");
@@ -175,10 +175,10 @@ void edit_customer(int client_socket)
 	}
 	struct customer new_customer;
 	int menue_option = 0;
-	char choice_buff[1024];
+	// char choice_buff[1024];
 	// send(client_socket, "Enter key to update the following characterstices \npress 1 for name. \npress 2 for contact. \npress 3 for address. ", strlen("Enter key to update the following characterstices \npress 1 for name. \npress 2 for contact. \npress 3 for address. "), 0);
-	int rcv_cusid = recv(client_socket, choice_buff, sizeof(choice_buff), 0);
-	menue_option = atoi(choice_buff);
+	int rcv_cusid = recv(client_socket, &menue_option, sizeof(menue_option), 0);
+	// menue_option = atoi(choice_buff);
 	switch (menue_option)
 	{
 	case 1:
@@ -193,9 +193,9 @@ void edit_customer(int client_socket)
 		break;
 	case 2:
 		// send(client_socket, "enter new contact: ", strlen("enter new contact: "), 0);
-		char contact_buff[1024];
-		int rcv_contact = recv(client_socket, contact_buff, sizeof(contact_buff), 0);
-		new_customer.contact = atoi(contact_buff);
+		// char contact_buff[1024];
+		int rcv_contact = recv(client_socket, &new_customer.contact, sizeof(new_customer.contact), 0);
+		// new_customer.contact = atoi(contact_buff);
 		if (rcv_contact <= 0)
 		{
 			perror("rcv error");
@@ -213,7 +213,7 @@ void edit_customer(int client_socket)
 		new_customer.address[rcv_name] = '\0';
 		break;
 	default:
-		send(client_socket, "Invalid input", strlen("Invalid input"), 0);
+		// send(client_socket, "Invalid input", strlen("Invalid input"), 0);
 		break;
 	}
 	int fd = open("customer_db.txt", O_RDWR);
@@ -295,7 +295,7 @@ void edit_customer(int client_socket)
 				}
 				send(client_socket, "record updated.", strlen("record updated."), 0);
 			}
-			else
+			else if(menue_option==3)
 			{
 				// send(client_socket, "customer found.updating reacord ....", strlen("customer found.updating reacord ...."), 0);
 				struct flock lk;
@@ -418,10 +418,10 @@ void add_employee(int client_socket)
 void edit_employee(int client_socket)
 {
 	int emp_id;
-	char emp_id_buff[1024];
+	// char emp_id_buff[1024];
 	// send(client_socket, "Enter employee id that you want to modify:", strlen("Enter employee id that you want to modify:"), 0);
-	int rcv_emp_id = recv(client_socket, &emp_id_buff, sizeof(emp_id_buff), 0);
-	emp_id = atoi(emp_id_buff);
+	int rcv_emp_id = recv(client_socket, &emp_id, sizeof(emp_id), 0);
+	// emp_id = atoi(emp_id_buff);
 	if (rcv_emp_id == -1)
 	{
 		perror("recv error");
@@ -429,7 +429,7 @@ void edit_employee(int client_socket)
 	}
 	struct employee new_emp;
 	// send(client_socket, "Enter employee name: ", strlen("Enter employee name: "), 0);
-	int rcv_empid = recv(client_socket, &new_emp.username, sizeof(new_emp.username), 0);
+	int rcv_empid = recv(client_socket, new_emp.username, sizeof(new_emp.username), 0);
 	if (rcv_empid <= 0)
 	{
 		perror("error in recv");
@@ -475,9 +475,11 @@ void edit_employee(int client_socket)
 				close(fd_read);
 				return;
 			}
-			// send(client_socket, "employee updated", strlen("employee updated"), 0);
+			send(client_socket, "employee updated", strlen("employee updated"), 0);
+			return;
 		}
 	}
+	send(client_socket, "employee not updated", strlen("employee not updated"), 0);
 	close(fd_read);
 }
 
