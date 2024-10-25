@@ -121,14 +121,14 @@ int main()
                         char tr_buffer[1024];
                         int rec_tr = recv(clientSocket, tr_buffer, sizeof(tr_buffer), 0);
                         tr_buffer[rec_tr] = '\0';
-                        char tr_buff2[1024];
-                        int recv_tr2 = recv(clientSocket,tr_buff2,sizeof(tr_buff2),0);
-                        printf("client 126:%s",tr_buff2);
-                        printf("client 127 %d\n",recv_tr2);
-                        char tr_buff3[1024];
-                        int recv_tr3 = recv(clientSocket,tr_buff3,sizeof(tr_buff3),0);
-                        printf("client 130:%s",tr_buff3);
-                        printf("client 131 %s\n",tr_buff3);
+                        // char tr_buff2[1024];
+                        // int recv_tr2 = recv(clientSocket,tr_buff2,sizeof(tr_buff2),0);
+                        // // printf("client 126:%s",tr_buff2);
+                        // // printf("client 127 %d\n",recv_tr2);
+                        // char tr_buff3[1024];
+                        // int recv_tr3 = recv(clientSocket,tr_buff3,sizeof(tr_buff3),0);
+                        // printf("client 130:%s",tr_buff3);
+                        // printf("client 131 %s\n",tr_buff3);
                         printf("%s", tr_buffer);
                         break;
                     case 5:

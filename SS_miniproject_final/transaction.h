@@ -258,7 +258,7 @@ void transfer_fund(int client_socket, int sender_customer_id, int receiver_custo
 			sprintf(msg, "Not enough balance.Current balance: %d", sender_id.balance);
 			send(client_socket, msg, strlen(msg), 0);
 			close(fd_read);
-			close(client_socket);
+			//close(client_socket);
 			return;
 		}
 		sender_id.balance = sender_id.balance - transfer_amount;
